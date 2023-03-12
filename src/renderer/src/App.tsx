@@ -1,12 +1,12 @@
 import Versions from './components/Versions'
 import icons from './assets/icons.svg'
+import { useEffect } from 'react'
+
+let mediaRecorder: MediaRecorder | null = null
+let recordedChunks: Blob[] = []
 
 function App(): JSX.Element {
   useEffect(() => {
-    window.api.onGlobalKeyEvent((_, args) => {
-      setLatestGlobalKeyEvent(args)
-    })
-
     window.api.startVoiceRecording(() => {
       console.log('started')
       navigator.mediaDevices
@@ -19,14 +19,10 @@ function App(): JSX.Element {
           })
 
           mediaRecorder.onstop = async (e) => {
-            console.log('stopped')
             const audioData = new Blob(recordedChunks, { type: 'audio/mp3' })
-            console.log(audioData)
-            // send audiodata to main to encode the mp3 (chrome doesn't support it)
-            console.log('sending to main')
             const buffer = await audioData.arrayBuffer()
-            console.log(buffer)
             window.api.onNewMp3Blob(buffer)
+
             recordedChunks = []
             mediaRecorder = null
           }
@@ -39,10 +35,10 @@ function App(): JSX.Element {
     })
 
     window.api.stopVoiceRecording(() => {
+      console.log('stopped')
       // if we are recording
       if (mediaRecorder) {
         mediaRecorder.stop()
-        console.log('stopped, these are the cunks:' + recordedChunks.length)
       }
     })
   }, [])
