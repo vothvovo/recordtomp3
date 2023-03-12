@@ -1,11 +1,13 @@
-import { app, shell, BrowserWindow } from 'electron'
+import { app, shell, BrowserWindow, globalShortcut } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
+let mainWindow: BrowserWindow | null = null
+
 function createWindow(): void {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
     show: false,
@@ -18,7 +20,7 @@ function createWindow(): void {
   })
 
   mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
+    mainWindow?.show()
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -38,7 +40,23 @@ function createWindow(): void {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
+
+let isRecording = false
+
 app.whenReady().then(() => {
+  // register shortcuts
+  globalShortcut.register('CommandOrControl+X', () => {
+    if (isRecording) {
+      // stop and get data
+      isRecording = false
+      mainWindow?.webContents.send('c-stopVoiceRecording')
+    } else {
+      isRecording = true
+      // start recording
+      mainWindow?.webContents.send('c-startVoiceRecording')
+    }
+  })
+
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
 
