@@ -2499,6 +2499,13 @@ keyv@^4.0.0:
   dependencies:
     json-buffer "3.0.1"
 
+lamejstmp@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/lamejstmp/-/lamejstmp-1.0.1.tgz#d304b74837371efe3c4812927ce429b131b82873"
+  integrity sha512-eEENqMTpiDNTaeOWWbv58KVT4uh9tP7XqpG+aODm9U2eRHwH8Hsx3OnNKxd3noVN6cHmQomv5HQ9N7tzTSVxNQ==
+  dependencies:
+    use-strict "1.0.1"
+
 lazy-val@^1.0.4, lazy-val@^1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/lazy-val/-/lazy-val-1.0.5.tgz#6cf3b9f5bc31cee7ee3e369c0832b7583dcd923d"
@@ -3478,6 +3485,11 @@ uri-js@^4.2.2:
   integrity sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==
   dependencies:
     punycode "^2.1.0"
+
+use-strict@1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/use-strict/-/use-strict-1.0.1.tgz#0bb80d94f49a4a05192b84a8c7d34e95f1a7e3a0"
+  integrity sha512-IeiWvvEXfW5ltKVMkxq6FvNf2LojMKvB2OCeja6+ct24S1XOmQw2dGr2JyndwACWAGJva9B7yPHwAmeA9QCqAQ==
 
 utf8-byte-length@^1.0.1:
   version "1.0.4"

@@ -3,6 +3,11 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
+import { ipcMain } from 'electron'
+import * as fs from 'fs'
+import os from 'os'
+import path from 'path'
+
 let mainWindow: BrowserWindow | null = null
 
 function createWindow(): void {
@@ -87,3 +92,37 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
+
+const lamejs = require('lamejstmp')
+
+ipcMain.on('c-onNewMp3Blob', (event, args: ArrayBuffer) => {
+  const mp3encoder = new lamejs.Mp3Encoder(1, 44100, 128) //mono 44.1khz encode to 128kbps
+  const mp3Data = []
+
+  let mp3Tmp = mp3encoder.encodeBuffer(new Int16Array(44100)) //encode mp3
+  console.log('result')
+  console.log(mp3Tmp)
+
+  //Push encode buffer to mp3Data variable
+  // @ts-expect-error idk there are no real types here
+  mp3Data.push(Buffer.from(mp3Tmp))
+
+  // Get end part of mp3
+  mp3Tmp = mp3encoder.flush()
+
+  // Write last data to the output data, too
+  // mp3Data contains now the complete mp3Data
+  // @ts-expect-error idk there are no real types here
+  mp3Data.push(Buffer.from(mp3Tmp))
+
+  console.log('final result')
+  console.log(mp3Data)
+
+  // create a buffer from the mp3 data
+  const buffer = Buffer.concat(mp3Data)
+
+  // write the buffer to a file
+  fs.writeFile(path.join(os.homedir(), 'result.mp3'), buffer, (err) => {
+    if (err) console.log(err)
+  })
+})
