@@ -2,6 +2,51 @@ import Versions from './components/Versions'
 import icons from './assets/icons.svg'
 
 function App(): JSX.Element {
+  useEffect(() => {
+    window.api.onGlobalKeyEvent((_, args) => {
+      setLatestGlobalKeyEvent(args)
+    })
+
+    window.api.startVoiceRecording(() => {
+      console.log('started')
+      navigator.mediaDevices
+        .getUserMedia({ audio: true })
+        .then((stream) => {
+          mediaRecorder = new MediaRecorder(stream)
+
+          mediaRecorder.addEventListener('dataavailable', (event) => {
+            recordedChunks.push(event.data)
+          })
+
+          mediaRecorder.onstop = async (e) => {
+            console.log('stopped')
+            const audioData = new Blob(recordedChunks, { type: 'audio/mp3' })
+            console.log(audioData)
+            // send audiodata to main to encode the mp3 (chrome doesn't support it)
+            console.log('sending to main')
+            const buffer = await audioData.arrayBuffer()
+            console.log(buffer)
+            window.api.onNewMp3Blob(buffer)
+            recordedChunks = []
+            mediaRecorder = null
+          }
+
+          mediaRecorder.start()
+        })
+        .catch((err) => {
+          console.error('Error accessing microphone:', err)
+        })
+    })
+
+    window.api.stopVoiceRecording(() => {
+      // if we are recording
+      if (mediaRecorder) {
+        mediaRecorder.stop()
+        console.log('stopped, these are the cunks:' + recordedChunks.length)
+      }
+    })
+  }, [])
+
   return (
     <div className="container">
       <Versions></Versions>
