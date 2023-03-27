@@ -3,7 +3,6 @@ import icons from './assets/icons.svg'
 import { useEffect } from 'react'
 
 let mediaRecorder: MediaRecorder | null = null
-let recordedChunks: Blob[] = []
 
 function App(): JSX.Element {
   useEffect(() => {
@@ -14,20 +13,16 @@ function App(): JSX.Element {
         .then((stream) => {
           mediaRecorder = new MediaRecorder(stream)
 
+          const fileReader = new FileReader();
+
           mediaRecorder.addEventListener('dataavailable', (event) => {
-            recordedChunks.push(event.data)
-          })
+            fileReader.readAsDataURL(event.data);
+            fileReader.onloadend = function() {
+              window.api.onNewMp3Blob(fileReader.result)
+            };
+          });
 
-          mediaRecorder.onstop = async (e) => {
-            const audioData = new Blob(recordedChunks, { type: 'audio/mp3' })
-            const buffer = await audioData.arrayBuffer()
-            window.api.onNewMp3Blob(buffer)
-
-            recordedChunks = []
-            mediaRecorder = null
-          }
-
-          mediaRecorder.start()
+          mediaRecorder.start();
         })
         .catch((err) => {
           console.error('Error accessing microphone:', err)
